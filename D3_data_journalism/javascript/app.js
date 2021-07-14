@@ -22,8 +22,8 @@ var prepareChart = svgArea.append("g")
 
 //Initial Paramters
 
-var xData = "age"
-var yData = "smokes"
+var xData = "poverty"
+var yData = "healthcare"
 
 function xAxisScale(dataSet,dataColumn) {
     let scale = d3.scaleLinear()
@@ -63,9 +63,22 @@ function drawChart(xScale, yScale, dataSet) {
         .attr("cx", d => xScale(d[xData]))
         .attr("cy", d => yScale(d[yData]))
         .attr("r","8")
-        .attr("fill","black")
+        .attr("stroke","black")
+        .attr("fill","white")
         .attr("opacity","1.0")
-};
+
+    prepareChart.selectAll("text")
+        .data(dataSet)
+        .enter()
+        .append("text")
+        .attr("x", d => xScale(d[xData]))
+        .attr("y", d => yScale(d[yData]))
+        .attr("fill","red")
+        .text(d => d.abbr);
+        };
+        
+
+    // dataPoints.append("text").attr("x","50%").attr("y","50%").attr("stroke","white").attr("stroke-width","2px").text("A!")
     
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     console.log(rawData)
@@ -79,5 +92,5 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     xScale = xAxisScale(rawData, xData);
     yScale = yAxisScale(rawData, yData);
 
-    drawChart(xScale,yScale, rawData);
+    drawChart(xScale, yScale, rawData);
 });
