@@ -22,8 +22,8 @@ var prepareChart = svgArea.append("g")
 
 //Initial Paramters
 
-var xData = "poverty"
-var yData = "healthcare"
+var xData = "age"
+var yData = "smokes"
 
 function xAxisScale(dataSet,dataColumn) {
     let scale = d3.scaleLinear()
@@ -45,7 +45,7 @@ function yAxisScale(dataSet, dataColumn) {
     return scale;
 }
 
-function drawChart(xScale, yScale, dataSet) {
+function drawAxis(xScale, yScale) {
     let xAxis = d3.axisBottom(xScale);
     let yAxis = d3.axisLeft(yScale);
 
@@ -55,42 +55,48 @@ function drawChart(xScale, yScale, dataSet) {
 
     prepareChart.append("g")
         .call(yAxis);
-    
+};
+
+function drawCircles(xScale, yScale, dataSet){
     prepareChart.selectAll("circle")
         .data(dataSet)
         .enter()
         .append("circle")
         .attr("cx", d => xScale(d[xData]))
         .attr("cy", d => yScale(d[yData]))
-        .attr("r","8")
-        .attr("stroke","black")
-        .attr("fill","white")
-        .attr("opacity","1.0")
+        .attr("r","5")
+        .attr("fill","lightblue")
+        .attr("opacity","1.0");
+};
 
-    prepareChart.selectAll("text")
-        .data(dataSet)
-        .enter()
-        .append("text")
-        .attr("x", d => xScale(d[xData]))
-        .attr("y", d => yScale(d[yData]))
-        .attr("fill","red")
-        .text(d => d.abbr);
+function addText(xScale, yScale, dataSet) {
+    dataSet.forEach((d) => {
+        prepareChart.append("text")
+            .attr("x", xScale(d[xData]-0.25))
+            .attr("y", yScale(d[yData]-0.1))
+            .attr("fill","black")
+            .attr("style","font-size:6px")
+            .text(d.abbr)
+        });
+
+        console.log(dataSet);
         };
+
+    
         
 
     // dataPoints.append("text").attr("x","50%").attr("y","50%").attr("stroke","white").attr("stroke-width","2px").text("A!")
     
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
-    console.log(rawData)
     rawData.forEach(data => {
         data[xData] = +data[xData];
         data[yData] = +data[yData];
     })
 
-    console.log(rawData)
-
     xScale = xAxisScale(rawData, xData);
     yScale = yAxisScale(rawData, yData);
-
-    drawChart(xScale, yScale, rawData);
+    
+    drawAxis(xScale, yScale);
+    drawCircles(xScale, yScale, rawData);
+    addText(xScale, yScale, rawData);
 });
