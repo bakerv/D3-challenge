@@ -25,11 +25,11 @@ var prepareChart = svgArea.append("g")
 var xData = "age"
 var yData = "smokes"
 
-function xAxisScale(dataSet) {
+function xAxisScale(dataSet,dataColumn) {
     let scale = d3.scaleLinear()
         .domain([
-            d3.min(dataSet, d =>d.age) * 0.8,
-            d3.max(dataSet, d => d.age) * 1.2])
+            d3.min(dataSet, data => data[dataColumn]) * 0.8,
+            d3.max(dataSet, data => data[dataColumn]) * 1.2])
         .range([0,chartWidth]);
     
     return scale;
@@ -45,18 +45,26 @@ function yAxisScale(dataSet, dataColumn) {
     return scale;
 }
 
-function drawAxis(xData, yData) {
-    let xAxis = d3.axisBottom(xData);
-    let yAxis = d3.axisLeft(yData);
+function drawChart(xScale, yScale, dataSet) {
+    let xAxis = d3.axisBottom(xScale);
+    let yAxis = d3.axisLeft(yScale);
 
     prepareChart.append("g")
         .attr("transform", `translate(0,${chartHeight})`)
         .call(xAxis);
 
     prepareChart.append("g")
-        .call(yAxis)
-
-    console.log("pizza");
+        .call(yAxis);
+    
+    prepareChart.selectAll("circle")
+        .data(dataSet)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xScale(d[xData]))
+        .attr("cy", d => yScale(d[yData]))
+        .attr("r","8")
+        .attr("fill","black")
+        .attr("opacity","1.0")
 };
     
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
@@ -71,5 +79,5 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     xScale = xAxisScale(rawData, xData);
     yScale = yAxisScale(rawData, yData);
 
-    drawAxis(xScale,yScale);
+    drawChart(xScale,yScale, rawData);
 });
