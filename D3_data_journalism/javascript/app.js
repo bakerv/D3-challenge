@@ -71,8 +71,6 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         prepareChart.append("g")
             .attr("id","yAxis")
             .call(yAxis);
-
-        return xAxisGroup, yAxisGroup;
     };
 
     function updateAxis(xScale, yScale){
@@ -86,16 +84,25 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     };
 
     function drawCircles(xScale, yScale, dataSet){
-        prepareChart.selectAll("circle")
+        dataMarkerGroup = prepareChart.selectAll("circle")
             .data(dataSet)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d[xData]))
             .attr("cy", d => yScale(d[yData]))
-            .attr("r","10")
+            .attr("r",10)
             .attr("fill","lightblue")
             .attr("opacity","1.0");
+
+        return dataMarkerGroup;
     };
+
+    function updateCircles(dataMarkerGroup, xData, xScale, yData, yScale) {
+        dataMarkerGroup.transition()
+            .duration(1000)
+            .attr("cx", d => xScale(d[xData]))
+            .attr("cy", d => yScale(d[yData]));
+    }
 
     function addText(xScale, yScale, dataSet) {
         dataSet.forEach((d) => {
@@ -149,15 +156,12 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     var xScale = xAxisScale(rawData, xData);
     var yScale = yAxisScale(rawData, yData);
 
-    var xAxisGroup, yAxisGroup = drawAxis(xScale, yScale);
-    drawCircles(xScale, yScale, rawData);
+    drawAxis(xScale, yScale);
+    dataMarkers = drawCircles(xScale, yScale, rawData);
     addText(xScale, yScale, rawData);
     labelAxes(xLabel,yLabel);
     populateMenu("#xdata", menuLabels);
     populateMenu("#ydata", menuLabels);
-
-    console.log(xAxisGroup)
-
     d3.selectAll("select").on("change", function() {
         // retrieve new x axis data
         let xValue = d3.select("#xdata")
@@ -178,6 +182,7 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         var yScaleNew = yAxisScale(rawData,dataY);
 
         updateAxis(xScaleNew, yScaleNew);
+        updateCircles(dataMarkers, dataX, xScaleNew,dataY, yScaleNew);
 
 
 
