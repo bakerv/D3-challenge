@@ -1,5 +1,5 @@
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
-
+    
     let svgHeight = 600;
     let svgWidth = 600;
 
@@ -67,7 +67,7 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         function drawAxis(xScale, yScale) {
             let xAxis = d3.axisBottom(xScale);
             let yAxis = d3.axisLeft(yScale);
-
+            prepareChart.html("")
             prepareChart.append("g")
                 .attr("transform", `translate(0,${chartHeight})`)
                 .call(xAxis);
