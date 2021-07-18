@@ -1,15 +1,15 @@
-let svgHeight = 500;
-let svgWidth = 960;
+let svgHeight = 600;
+let svgWidth = 600;
 
 let margin = {
-    top:20,
-    bottom: 20,
-    left: 20,
-    right:20
+    top:50,
+    bottom: 50,
+    left: 50,
+    right: 50
 };
 
 let chartHeight = svgHeight - margin.top - margin.bottom;
-let chartWidth = svgHeight - margin.left - margin.right;
+let chartWidth = svgWidth - margin.left - margin.right;
 
 let svgArea = d3.select("#plot")
     .append("svg")
@@ -19,11 +19,21 @@ let svgArea = d3.select("#plot")
 var prepareChart = svgArea.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+let menuLabels = [
+    {poverty: "Poverty (%)"},
+    {age: "Age (Median)"},
+    {income: "Income (Median)"},
+    {healthcare: "Healthcare Coverage (%)"},
+    {obesity: "Obesity (%)"},
+    {smokes: "Active Smokers (%)"}];
+
 
 //Initial Paramters
 
-var xData = "age"
-var yData = "smokes"
+var xData = Object.keys(menuLabels[5])
+var yData = Object.keys(menuLabels[0])
+var xLabels = Object.values(menuLabels[5])
+var yLabels = Object.values(menuLabels[0])
 
 function xAxisScale(dataSet,dataColumn) {
     let scale = d3.scaleLinear()
@@ -64,7 +74,7 @@ function drawCircles(xScale, yScale, dataSet){
         .append("circle")
         .attr("cx", d => xScale(d[xData]))
         .attr("cy", d => yScale(d[yData]))
-        .attr("r","5")
+        .attr("r","10")
         .attr("fill","lightblue")
         .attr("opacity","1.0");
 };
@@ -72,31 +82,60 @@ function drawCircles(xScale, yScale, dataSet){
 function addText(xScale, yScale, dataSet) {
     dataSet.forEach((d) => {
         prepareChart.append("text")
-            .attr("x", xScale(d[xData]-0.25))
-            .attr("y", yScale(d[yData]-0.1))
+            .attr("x", xScale(d[xData]-0.45))
+            .attr("y", yScale(d[yData]-0.2))
             .attr("fill","black")
-            .attr("style","font-size:6px")
+            .attr("style","font-size:10px")
             .text(d.abbr)
         });
 
         console.log(dataSet);
         };
 
-    
+    function labelAxes(xlabel, ylabel) {
+        let xGroup = svgArea.append("g")
+        let yGroup = svgArea.append("g")
         
+        xGroup.append("text")
+            .attr("x", (chartWidth /2) + margin.left)
+            .attr("y",chartHeight + margin.top + 35 )
+            .attr("style","text-anchor:middle")
+            .attr("value","xAxisLabel")
+            .text(xlabel)
 
-    // dataPoints.append("text").attr("x","50%").attr("y","50%").attr("stroke","white").attr("stroke-width","2px").text("A!")
+        yGroup.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 20)
+            .attr("x",- (chartHeight /2 ) - margin.top)
+            .attr("value","yAxisLabel")
+            .attr("style","text-anchor:middle")
+            .text(ylabel)
+    };
+
+    function populateMenu(menu, data) {
+        // generate options for the select menu, and link the associated index with the id option
+        // This linkage will be used to select which data set to display
+        data.forEach((entry) => {
+            let selectMenu = d3.select(menu);
+            let dataOption = selectMenu.append("option")
+            dataOption.text(Object.values(entry));
+            dataOption.attr('value', Object.keys(entry)); 
+        });
+    };
     
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     rawData.forEach(data => {
         data[xData] = +data[xData];
         data[yData] = +data[yData];
-    })
+    });
 
-    xScale = xAxisScale(rawData, xData);
-    yScale = yAxisScale(rawData, yData);
+    let xScale = xAxisScale(rawData, xData);
+    let yScale = yAxisScale(rawData, yData);
     
+    populateMenu("#test1", menuLabels);
+    populateMenu("#test2", menuLabels);
     drawAxis(xScale, yScale);
     drawCircles(xScale, yScale, rawData);
     addText(xScale, yScale, rawData);
+    labelAxes(xLabels,yLabels);
 });
