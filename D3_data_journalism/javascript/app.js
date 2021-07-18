@@ -30,10 +30,10 @@ let menuLabels = [
 
 //Initial Paramters
 
-var xData = Object.keys(menuLabels[5])
-var yData = Object.keys(menuLabels[0])
-var xLabels = Object.values(menuLabels[5])
-var yLabels = Object.values(menuLabels[0])
+var xData = Object.keys(menuLabels[1])
+var yData = Object.keys(menuLabels[3])
+var xLabels = Object.values(menuLabels[2])
+var yLabels = Object.values(menuLabels[1])
 
 function xAxisScale(dataSet,dataColumn) {
     let scale = d3.scaleLinear()
@@ -93,8 +93,9 @@ function addText(xScale, yScale, dataSet) {
         };
 
     function labelAxes(xlabel, ylabel) {
-        let xGroup = svgArea.append("g")
-        let yGroup = svgArea.append("g")
+        let xGroup = svgArea.append("g");
+        let yGroup = svgArea.append("g");
+        let titleGroup = svgArea.append("g");
         
         xGroup.append("text")
             .attr("x", (chartWidth /2) + margin.left)
@@ -110,18 +111,25 @@ function addText(xScale, yScale, dataSet) {
             .attr("value","yAxisLabel")
             .attr("style","text-anchor:middle")
             .text(ylabel)
+
+        titleGroup.append("text")
+            .attr("x", (chartWidth /2) + margin.left)
+            .attr("y", margin.top)
+            .attr("value","title")
+            .attr("style","text-anchor:middle")
+            .text("TITLE")
     };
 
-    function populateMenu(menu, data) {
-        // generate options for the select menu, and link the associated index with the id option
-        // This linkage will be used to select which data set to display
-        data.forEach((entry) => {
-            let selectMenu = d3.select(menu);
-            let dataOption = selectMenu.append("option")
-            dataOption.text(Object.values(entry));
-            dataOption.attr('value', Object.keys(entry)); 
-        });
-    };
+function populateMenu(menu, data) {
+    // generate options for the select menu, and link the associated index with the id option
+    // This linkage will be used to select which data set to display
+    data.forEach((entry) => {
+        let selectMenu = d3.select(menu);
+        let dataOption = selectMenu.append("option")
+        dataOption.text(Object.values(entry));
+        dataOption.attr('value', Object.keys(entry)); 
+    });
+};
     
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     rawData.forEach(data => {
@@ -132,8 +140,8 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     let xScale = xAxisScale(rawData, xData);
     let yScale = yAxisScale(rawData, yData);
     
-    populateMenu("#test1", menuLabels);
-    populateMenu("#test2", menuLabels);
+    populateMenu("#xdata", menuLabels);
+    populateMenu("#ydata", menuLabels);
     drawAxis(xScale, yScale);
     drawCircles(xScale, yScale, rawData);
     addText(xScale, yScale, rawData);
