@@ -1,7 +1,7 @@
 d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
-    
     rawData.forEach(data => +data);
 
+    // specify overall plotting parameters
     let svgHeight = 600;
     let svgWidth = 600;
 
@@ -15,14 +15,16 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     let chartHeight = svgHeight - margin.top - margin.bottom;
     let chartWidth = svgWidth - margin.left - margin.right;
 
+    // Create html tags for dynamic editing
     let svgArea = d3.select("#plot")
         .append("svg")
         .attr("height", svgHeight)
         .attr("width", svgWidth);
 
-    var prepareChart = svgArea.append("g")
+    let prepareChart = svgArea.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+    //Create display labels for each column of the data
     let menuLabels = [
         {poverty: "Poverty (%)"},
         {age: "Age (Median)"},
@@ -31,15 +33,12 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         {obesity: "Obesity (%)"},
         {smokes: "Active Smokers (%)"}];
 
-
-    //Initial Paramters
+    // Initial Plot Parameters
     var xData = Object.keys(menuLabels[1])
     var yData = Object.keys(menuLabels[1])
     var xLabel = Object.values(menuLabels[1])
     var yLabel = Object.values(menuLabels[1])
     
-    
-
     function xAxisScale(dataSet,dataColumn) {
         let scale = d3.scaleLinear()
             .domain([
@@ -63,12 +62,27 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
     function drawAxis(xScale, yScale) {
         let xAxis = d3.axisBottom(xScale);
         let yAxis = d3.axisLeft(yScale);
+       
         prepareChart.append("g")
             .attr("transform", `translate(0,${chartHeight})`)
+            .attr("id","xAxis")
             .call(xAxis);
 
         prepareChart.append("g")
+            .attr("id","yAxis")
             .call(yAxis);
+
+        return xAxisGroup, yAxisGroup;
+    };
+
+    function updateAxis(xScale, yScale){
+        d3.selectAll("#xAxis").transition()
+            .duration(1000)
+            .call(d3.axisBottom(xScale));
+
+        d3.selectAll("#yAxis").transition()
+            .duration(1000)
+            .call(d3.axisLeft(yScale));
     };
 
     function drawCircles(xScale, yScale, dataSet){
@@ -120,8 +134,6 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
             .attr("value","title")
             .attr("style","text-anchor:middle")
             .text("Comparison of Demographics and Risk Factors in the United States")
-
-        return xGroup, yGroup;
     };
     function populateMenu(menu, data) {
         // generate options for the select menu, and link the associated index with the id option
@@ -134,15 +146,17 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         });
     };
  
-    let xScale = xAxisScale(rawData, xData);
-    let yScale = yAxisScale(rawData, yData);
+    var xScale = xAxisScale(rawData, xData);
+    var yScale = yAxisScale(rawData, yData);
 
-    drawAxis(xScale, yScale);
+    var xAxisGroup, yAxisGroup = drawAxis(xScale, yScale);
     drawCircles(xScale, yScale, rawData);
     addText(xScale, yScale, rawData);
-    var xGroup, yGroup = labelAxes(xLabel,yLabel);
+    labelAxes(xLabel,yLabel);
     populateMenu("#xdata", menuLabels);
     populateMenu("#ydata", menuLabels);
+
+    console.log(xAxisGroup)
 
     d3.selectAll("select").on("change", function() {
         // retrieve new x axis data
@@ -160,8 +174,13 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         // update the chart with the new data
         d3.selectAll("#xAxisLabel").text(xLabels);
         d3.selectAll("#yAxisLabel").text(yLabels);
+        var xScaleNew = xAxisScale(rawData,dataX);
+        var yScaleNew = yAxisScale(rawData,dataY);
+
+        updateAxis(xScaleNew, yScaleNew);
 
 
-        console.log(yGroup.text())
+
+        console.log(dataY)
     });
 });
