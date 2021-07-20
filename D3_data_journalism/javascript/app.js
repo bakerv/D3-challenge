@@ -33,10 +33,10 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
         {smokes: "Active Smokers (%)"}];
 
     // Initial Plot Parameters
-    var xData = Object.keys(menuLabels[5])
-    var yData = Object.keys(menuLabels[4])
-    var xLabel = Object.values(menuLabels[5])
-    var yLabel = Object.values(menuLabels[04])
+    var xData = Object.keys(menuLabels[0])
+    var yData = Object.keys(menuLabels[0])
+    var xLabel = Object.values(menuLabels[0])
+    var yLabel = Object.values(menuLabels[0])
     
     function xAxisScale(dataSet,dataColumn) {
         var scale = d3.scaleLinear()
@@ -93,7 +93,7 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
             .attr("r",10)
             .attr("fill","lightblue")
             .attr("opacity","1.0");
-
+            
         return dataMarkerGroup;
     };
 
@@ -151,14 +151,14 @@ d3.csv("D3_data_journalism/data/data.csv").then(rawData => {
             .attr("font-size","20px")
             .text("2014 Census Data Relationships (United States of America)")
     };
-    function populateMenu(menu, data) {
+    function populateMenu(menu, data, defaultOption) {
         // generate options for the select menu, and link the associated index with the id option
         // This linkage will be used to select which data set to display
         data.forEach((entry,index) => {
             let selectMenu = d3.select(menu);
             let dataOption = selectMenu.append("option")
             dataOption.text(Object.values(entry));
-            dataOption.attr('value', index); 
+            dataOption.attr('value', index);
         });
     };
     // draw the initial plot on the page
